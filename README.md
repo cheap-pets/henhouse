@@ -131,10 +131,10 @@ const myProxyService = new ProxyService({
 
 #### new HttpException(status, message, stackEnumerable)
 create a new http exception
-| Param | Type | Description |
-| --- | --- | --- |
-| status | <code>Numeric</code> | http status code |
-| message | <code>String</code> | customized error message |
+| Param           | Type                 | Description                              |
+| --------------- | -------------------- | ---------------------------------------- |
+| status          | <code>Numeric</code> | http status code                         |
+| message         | <code>String</code>  | customized error message                 |
 | stackEnumerable | <code>Boolean</code> | include the stack info or not. _false_ as default |
 
 ```javascript
