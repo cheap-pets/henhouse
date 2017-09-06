@@ -131,6 +131,7 @@ const myProxyService = new ProxyService({
 
 #### new HttpException(status, message, stackEnumerable)
 create a new http exception
+
 | Param           | Type                 | Description                              |
 | --------------- | -------------------- | ---------------------------------------- |
 | status          | <code>Numeric</code> | http status code                         |
