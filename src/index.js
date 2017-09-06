@@ -1,4 +1,4 @@
-const HttpServive = require('./http-service');
+const HttpService = require('./http-service');
 const ProxyService = require('./proxy-service');
 const HttpException = require('./http-exception');
 
