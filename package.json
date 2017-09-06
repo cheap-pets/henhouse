@@ -1,6 +1,6 @@
 {
   "name": "henhouse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "tool kits for building simple http services, based on koa & http-proxy",
   "main": "src/index.js",
   "scripts": {

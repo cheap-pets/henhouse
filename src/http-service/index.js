@@ -29,8 +29,8 @@ class HttpService {
     });
 
     //process options
-    if (option && option.dir) {
-      this.static(option.dir);
+    if (option && option.staticRoot) {
+      this.static(option.staticRoot);
     }
   }
   static (path, options) {

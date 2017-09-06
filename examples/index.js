@@ -1,7 +1,7 @@
-const { HttpServive, ProxyService, HttpException } = require('../src');
+const { HttpService, ProxyService, HttpException } = require('../src');
 const { resolve } = require('path');
 
-const httpServive = new HttpServive();
+const httpServive = new HttpService();
 httpServive
   .get('/a', async (ctx, next) => {
     ctx.body = 'ok';
@@ -13,7 +13,7 @@ httpServive
   })
   .listen(3000);
 
-const mockService = new HttpServive();
+const mockService = new HttpService();
 mockService
   .get('/a', {
     a: 'hello'
@@ -25,7 +25,7 @@ mockService
 
 const rootDir = resolve(__dirname, 'static', 'root');
 const otherDir = resolve(__dirname, 'static', 'others');
-const staticService = new HttpServive();
+const staticService = new HttpService();
 staticService
   .static({ root: rootDir })
   .static('/s1', { root: otherDir })
