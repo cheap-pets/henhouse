@@ -30,7 +30,9 @@ class HttpService {
 
     //process options
     if (option && option.staticRoot) {
-      this.addStatic(option.staticRoot);
+      this.addStatic({
+        root: option.staticRoot
+      });
     }
   }
   addStatic (path, options) {

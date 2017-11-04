@@ -11,7 +11,7 @@ function mapper (mappingPath, target) {
     if (arr) {
       return {
         host: url.host,
-        url: (arr ? urlString.slice(arr[0].length) : '') + path,
+        url: path + (arr ? urlString.slice(arr[0].length) : ''),
         target: `${url.protocol}//${url.host}`
       };
     }
