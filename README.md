@@ -123,7 +123,8 @@ can also put rules in constructor options
 ```javascript
 const myProxyService = new ProxyService({
   '/foo': 'http://localhost:3000',
-  '/bar': 'http://localhost:3001'
+  '/bar': 'http://localhost:3001',
+  'default': 'http://localhost: 8888'
 })
 ```
 
