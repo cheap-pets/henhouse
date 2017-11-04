@@ -27,9 +27,9 @@ const rootDir = resolve(__dirname, 'static', 'root');
 const otherDir = resolve(__dirname, 'static', 'others');
 const staticService = new HttpService();
 staticService
-  .static({ root: rootDir })
-  .static('/s1', { root: otherDir })
-  .static('/test')
+  .addStatic({ root: rootDir })
+  .addStatic('/s1', { root: otherDir })
+  .addStatic('/test')
   .listen(3002);
 
 const proxyService = new ProxyService({

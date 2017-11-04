@@ -11,11 +11,19 @@ function mapper (mappingPath, target) {
     if (arr) {
       return {
         host: url.host,
-        url: urlString.slice(arr[0].length) + path,
+        url: (arr ? urlString.slice(arr[0].length) : '') + path,
         target: `${url.protocol}//${url.host}`
       };
     }
   };
+}
+
+function doProxy (req, res, mapping) {
+  req.url = mapping.url;
+  req.headers.host = mapping.host;
+  this.$proxy.web(req, res, {
+    target: mapping.target
+  });
 }
 
 class Proxy {
@@ -23,24 +31,26 @@ class Proxy {
     this.$maps = [];
     this.$proxy = HttpProxy.createProxyServer();
     this.$proxy.on('error', function(err, req, res) {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end(err.message);
+      if (res) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end(err.message);
+      }
     });
     this.$server = Http.createServer((req, res) => {
       if (this.$maps.every(map => {
         const m = map(req.url);
         if (m) {
-          req.url = m.url;
-          req.headers.host = m.host;
-          this.$proxy.web(req, res, {
-            target: m.target
-          });
+          doProxy.call(this, req, res, m);
           return false;
         }
         return true;
       })) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
+        if (this.$maps.default) {
+          doProxy.call(this, req, res, this.$maps.default(req.url));
+        } else {
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.end('Not Found');
+        }
       }
     });
     if (mappings) {
@@ -49,7 +59,11 @@ class Proxy {
   }
   add(mappings) {
     Object.keys(mappings).forEach(k => {
-      this.$maps.push(mapper(k, mappings[k]));
+      if (k === 'default') {
+        this.$maps.default = mapper('', mappings[k]);
+      } else {
+        this.$maps.push(mapper(k, mappings[k]));
+      }
     });
     return this;
   }
