@@ -1,7 +1,7 @@
 {
   "name": "henhouse",
-  "version": "1.0.3",
-  "description": "tool kits for building simple http services, based on koa & http-proxy",
+  "version": "2.0.0",
+  "description": "A Microservices Framework for REST APIs",
   "main": "src/index.js",
   "scripts": {},
   "author": "scrollbar.ww",
@@ -13,18 +13,12 @@
     "src"
   ],
   "engines": {
-    "node": ">=7.9.0"
+    "node": ">=8.9.0"
   },
   "dependencies": {
-    "cli": "^1.0.1",
-    "http-proxy": "^1.16.2",
-    "koa": "^2.3.0",
-    "koa-body": "^2.3.0",
-    "koa-router": "^7.2.1",
-    "koa-send": "^4.1.0",
-    "koa-static": "^4.0.1",
-    "log4js": "^2.3.2",
-    "methods": "^1.1.2"
-  },
-  "devDependencies": {}
+    "koa": "^2.4.1",
+    "koa-body": "^2.5.0",
+    "koa-router": "^7.3.0",
+    "koa-send": "^4.1.2"
+  }
 }

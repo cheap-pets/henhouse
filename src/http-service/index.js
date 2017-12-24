@@ -1,99 +1,83 @@
-const http = require('http');
-const Koa = require('koa');
-const KoaRouter = require('koa-router');
-const koaBody = require('koa-body');
-const koaSend = require('koa-send');
-const methods = require('methods');
-const log = require('../log');
+const http = require('http')
+const Koa = require('koa')
+const KoaRouter = require('koa-router')
+const koaBody = require('koa-body')
+const koaSend = require('koa-send')
+const methods = require('./http-methods')
+const { isString } = require('../utils/check-type')
 
 class HttpService {
-  constructor(option) {
-    this.$koa = new Koa();
-    this.$koa.on('error', err => {
-      log.error('server error', err);
-    });
-
-    //log the timespan of each request
-    this.$koa.use(async (ctx, next) => {
-      const start = new Date();
+  constructor (option) {
+    const koa = new Koa()
+    koa.on('error', (err, ctx) => {
+      console.error('server error', err)
+    })
+    koa.use(async (ctx, next) => {
+      const start = new Date()
       try {
-        await next();
+        await next()
       } catch (e) {
-        ctx.status = parseInt(e.status, 10) || 500;
-        ctx.body = e;
-        ctx.app.emit('error', e, ctx);
+        ctx.status = parseInt(e.status, 10) || 500
+        ctx.body = e
+        ctx.app.emit('error', e, ctx)
       } finally {
-        const ms = new Date() - start;
-        log.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`);
+        const ms = new Date() - start
+        console.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`)
       }
-    });
-
-    //process options
-    if (option && option.staticRoot) {
-      this.addStatic({
-        root: option.staticRoot
-      });
-    }
+    })
+    koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
+    const router = new KoaRouter()
+    koa.use(router.routes())
+    koa.use(router.allowedMethods())
+    const server = http.createServer(koa.callback())
+    server.on('close', () => {
+      console.info('server closed.')
+    })
+    this.koa = koa
+    this.router = router
+    this.httpServer = server
   }
-  addStatic (path, options) {
-    if (!options && path.root) {
-      options = path;
-      path = '/';
-    }
-    options = options || {};
-    if (options.index !== false) options.index = options.index || 'index.html';
-    this.$koa.use(async (ctx, next) => {
-      let done = false;
-      if ((ctx.method === 'HEAD' || ctx.method === 'GET') && ctx.path.indexOf(path) === 0) {
+  use (middleware) {
+    this.koa.use(middleware)
+    return this
+  }
+  useStatic (path, options) {
+    isString(options) && (options = { root: options })
+    options.index === undefined && (options.index = 'index.html')
+    this.koa.use(async (ctx, next) => {
+      let done = false
+      if (
+        (ctx.method === 'HEAD' || ctx.method === 'GET') &&
+        ctx.path.indexOf(path) === 0
+      ) {
         try {
-          done = await koaSend(ctx, ctx.path, options);
+          done = await koaSend(ctx, ctx.path, options)
         } catch (err) {
           if (err.status !== 404) {
-            throw err;
+            throw err
           }
         }
       }
       if (!done) {
-        await next();
+        await next()
       }
-    });
-    return this;
+    })
+    return this
   }
   listen (port) {
-    if (!this.$server) {
-      this.$server = http.createServer(this.$koa.callback());
-      this.$server.on('close', () => {
-        log.info('server closed.');
-      });
-    }
-    this.$server.listen(port);
+    this.httpServer.listen(port)
   }
   close () {
-    this.$server.close();
+    this.httpServer.close()
   }
 }
 
-//init router's methods
+// init router's methods
 methods.forEach(method => {
-  HttpService.prototype[method] = function () {
-    if (!this.$router) {
-      this.$router = new KoaRouter();
-      this.$koa.use(koaBody({ formidable: { uploadDir: __dirname } }));
-      this.$koa.use(this.$router.routes());
-      this.$koa.use(this.$router.allowedMethods());
-    }
-    const len = arguments.length;
-    const path = arguments[0];
-    const handler = arguments[len - 1];
-    if (typeof handler === 'function') {
-      this.$router[method].apply(this.$router, arguments);
-    } else {
-      this.$router[method](path, (ctx) => {
-        ctx.body = handler;
-      });
-    }
-    return this;
-  };
-});
+  HttpService.prototype[method] = function (path, middleware) {
+    this.router[method](path, middleware)
+    return this
+  }
+})
 
-module.exports = HttpService;
+module.exports = HttpService
