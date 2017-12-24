@@ -18,6 +18,11 @@ class HttpService {
         await next()
       } catch (e) {
         ctx.status = parseInt(e.status, 10) || 500
+        if (e.stack && option.logStackError === true) {
+          Object.defineProperty(e, 'stack', {
+            enumerable: true
+          })
+        }
         ctx.body = e
         ctx.app.emit('error', e, ctx)
       } finally {
