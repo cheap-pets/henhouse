@@ -17,6 +17,7 @@ function bindModelMethod (service, modelName, method, middleware) {
 
 class Henhouse {
   constructor (options) {
+    options = options || {}
     this.httpService = new HttpService()
     this.servicePath = options.servicePath
     this.models = {}
