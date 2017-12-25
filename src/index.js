@@ -23,6 +23,7 @@ class Henhouse {
     this.models = {}
   }
   define (store, modelName, attributes, options) {
+    options = options || {}
     const model = store.define(modelName, attributes, options)
     model.store = store
     model.path = options.path || getDefaultModelPath(modelName)
