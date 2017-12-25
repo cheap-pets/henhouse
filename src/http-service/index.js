@@ -7,7 +7,8 @@ const methods = require('./http-methods')
 const { isString } = require('../utils/check-type')
 
 class HttpService {
-  constructor (option) {
+  constructor (options) {
+    options = options || {}
     const koa = new Koa()
     koa.on('error', (err, ctx) => {
       console.error('server error', err)
@@ -18,7 +19,7 @@ class HttpService {
         await next()
       } catch (e) {
         ctx.status = parseInt(e.status, 10) || 500
-        if (e.stack && option.logStackError === true) {
+        if (e.stack && options.logStackError !== false) {
           Object.defineProperty(e, 'stack', {
             enumerable: true
           })
