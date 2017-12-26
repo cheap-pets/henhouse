@@ -1,7 +1,8 @@
 const HttpService = require('./http-service')
 const methods = require('./http-service/http-methods')
 const resolve = require('./utils/resolve-path')
-const attributesQuery2Array = require('./utils/attributes-query-to-array')
+const parseAttributes = require('./utils/parse-attributes')
+// const attributesQuery2Array = require('./utils/attributes-query-to-array')
 
 const HttpException = require('./http-service/http-exception')
 
@@ -58,14 +59,16 @@ methods.forEach(method => {
     )
     this.httpService[method](path, async (ctx, next) => {
       if (ctx.query.fields) {
-        ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
+        // ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
+        ctx.$attributes = parseAttributes(ctx.query.fields)
       }
       await middleware(ctx, next, model)
     })
     if (model && ['get', 'put', 'patch', 'delete'].indexOf(method) >= 0) {
       this.httpService[method](path + '/:id', async (ctx, next) => {
         if (ctx.query.fields) {
-          ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
+          // ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
+          ctx.$attributes = parseAttributes(ctx.query.fields)
         }
         await middleware(ctx, next, model, ctx.params.id)
       })
