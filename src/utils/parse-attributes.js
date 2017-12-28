@@ -1,15 +1,30 @@
-function parseAttribute (attributeString, obj) {
+function parseAttribute (attributeString, result) {
   const arr = (attributeString || '').split('.')
   for (let i = 0, len = arr.length; i < len; i++) {
-    let attr = arr[i].trim()
-    if (attr === '') break
-    if (obj[attr]) {
-      obj = obj[attr]
+    const attr = arr[i].trim()
+    if (!result[attr]) {
+      result[attr] = {}
+    }
+    result = result[attr]
+  }
+}
+
+function convert2Array (obj) {
+  const result = []
+  const keys = Object.keys(obj)
+  for (let i = 0, len = keys.length; i < len; i++) {
+    const key = keys[i]
+    const item = obj[key]
+    if (Object.keys(item).length === 0) {
+      result.push(key)
     } else {
-      if (obj === 1) obj = {}
-      obj[attr] = 1
+      const v = convert2Array(item)
+      if (v) {
+        result.push({ [key]: v })
+      }
     }
   }
+  return result.length ? result : null
 }
 
 function parseAttributes (attributesQuery) {
@@ -18,7 +33,7 @@ function parseAttributes (attributesQuery) {
   for (let i = 0, len = arr.length; i < len; i++) {
     parseAttribute(arr[i], result)
   }
-  return result
+  return convert2Array(result)
 }
 
 module.exports = parseAttributes

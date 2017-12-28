@@ -27,6 +27,7 @@ class Henhouse {
     options = options || {}
     const model = store.define(modelName, attributes, options)
     model.store = store
+    model.attributes = attributes
     model.path = options.path || getDefaultModelPath(modelName)
     this.models[modelName] = model
     const methods = model.methods || {}
@@ -60,7 +61,8 @@ methods.forEach(method => {
     this.httpService[method](path, async (ctx, next) => {
       if (ctx.query.fields) {
         // ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
-        ctx.$attributes = parseAttributes(ctx.query.fields)
+        const attrs = parseAttributes(ctx.query.fields)
+        attrs && (ctx.$attributes = attrs)
       }
       await middleware(ctx, next, model)
     })
@@ -68,7 +70,8 @@ methods.forEach(method => {
       this.httpService[method](path + '/:id', async (ctx, next) => {
         if (ctx.query.fields) {
           // ctx.attributesQueryArray = attributesQuery2Array(ctx.query.fields)
-          ctx.$attributes = parseAttributes(ctx.query.fields)
+          const attrs = parseAttributes(ctx.query.fields)
+          attrs && (ctx.$attributes = attrs)
         }
         await middleware(ctx, next, model, ctx.params.id)
       })
