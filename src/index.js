@@ -62,7 +62,7 @@ methods.forEach(method => {
       if (ctx.query.fields) {
         const attrs = parseAttributes(ctx.query.fields)
         attrs && (ctx.$attributes = attrs)
-        ctx.request.body && (ctx.$formData = parseBody(ctx.request.body))
+        ctx.request.body && (ctx.$body = parseBody(ctx.request.body))
       }
       await middleware(ctx, next, model)
     })
