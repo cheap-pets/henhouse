@@ -12,7 +12,7 @@ function parseQuery (key, value, result) {
 function parseQuerys (query) {
   const result = {}
   for (let key in query) {
-    if (key !== 'fields' && key !== 'limit' && key !== 'offset') {
+    if (key !== 'fields') {
       parseQuery(key, query[key], result)
     }
   }
