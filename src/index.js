@@ -1,7 +1,9 @@
 const HttpService = require('./http-service')
 const methods = require('./http-service/http-methods')
 const resolve = require('./utils/resolve-path')
+
 const parseAttributes = require('./utils/parse-attributes')
+const parseQuerys = require('./utils/parse-querys')
 const parseBody = require('./utils/parse-body')
 
 const HttpException = require('./http-service/http-exception')
@@ -63,6 +65,7 @@ methods.forEach(method => {
         const attrs = parseAttributes(ctx.query.fields)
         attrs && (ctx.$attributes = attrs)
       }
+      ctx.$query = parseQuerys(ctx.query)
       ctx.request.body && (ctx.$requestBody = parseBody(ctx.request.body))
       await middleware(ctx, next, model)
     })
@@ -72,6 +75,7 @@ methods.forEach(method => {
           const attrs = parseAttributes(ctx.query.fields)
           attrs && (ctx.$attributes = attrs)
         }
+        ctx.$query = parseQuerys(ctx.query)
         ctx.request.body && (ctx.$requestBody = parseBody(ctx.request.body))
         await middleware(ctx, next, model, ctx.params.id)
       })
