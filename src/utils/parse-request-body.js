@@ -1,4 +1,4 @@
-function parseBody (data) {
+function parseRequestBody (data) {
   let arr = []
   let i = 0
   for (let key in data) {
@@ -8,4 +8,4 @@ function parseBody (data) {
   }
   return arr
 }
-module.exports = parseBody
+module.exports = parseRequestBody
