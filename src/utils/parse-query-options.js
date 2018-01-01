@@ -75,6 +75,10 @@ function parseQueryOptions (query) {
       case 'order':
         parseOrders(value, result)
         break
+      case 'limit':
+      case 'offset':
+        result[key] = value
+        break
       default:
         parseConditions(key, query[key], result)
     }

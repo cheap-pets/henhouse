@@ -1,6 +1,6 @@
 {
   "name": "henhouse",
-  "version": "2.0.14",
+  "version": "2.0.15",
   "description": "A Microservices Framework for REST APIs",
   "main": "src/index.js",
   "scripts": {},
