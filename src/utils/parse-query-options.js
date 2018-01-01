@@ -47,13 +47,15 @@ function parseOrders (ordersString, result) {
   }
 }
 
-function parseQuery (key, value, result) {
+function parseConditions (key, value, result) {
   const arr = key.split('.')
   for (let i = 0, len = arr.length; i < len; i++) {
     const attr = arr[i].trim()
     if (i === len - 1) {
-      !result.conditions && (result.conditions = {})
-      result.conditions[attr] = value
+      !result.conditions && (result.conditions = [])
+      result.conditions.push({
+        [attr]: value
+      })
     } else {
       !result.associations && (result.associations = {})
       !result.associations[attr] && (result.associations[attr] = {})
@@ -74,7 +76,7 @@ function parseQueryOptions (query) {
         parseOrders(value, result)
         break
       default:
-        parseQuery(key, query[key], result)
+        parseConditions(key, query[key], result)
     }
   }
   return Object.keys(result).length ? result : null
