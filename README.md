@@ -74,7 +74,7 @@ myService
 ```
 
 ##### url query options
-* specify attributes white list
+* specify attributes white list
 ```url
 http://localhost:3000/foos?fields=a,b
 ```
