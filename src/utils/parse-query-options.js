@@ -3,11 +3,12 @@ function parseAttribute (attributeString, result) {
   for (let i = 0, len = arr.length; i < len; i++) {
     const attr = arr[i].trim()
     if (i === len - 1) {
-      !result.$attributes && (result.$attributes = [])
-      result.$attributes.push(attr)
+      !result.attributes && (result.attributes = [])
+      result.attributes.push(attr)
     } else {
-      !result[attr] && (result[attr] = {})
-      result = result[attr]
+      !result.associations && (result.associations = {})
+      !result.associations[attr] && (result.associations[attr] = {})
+      result = result.associations[attr]
     }
   }
 }
@@ -29,11 +30,12 @@ function parseOrder (orderString, result) {
       isDesc = true
     }
     if (i === len - 1) {
-      !result.$orders && (result.$orders = [])
-      result.$orders.push(isDesc ? '-' + attr : attr)
+      !result.orders && (result.orders = [])
+      result.orders.push(isDesc ? '-' + attr : attr)
     } else {
-      !result[attr] && (result[attr] = {})
-      result = result[attr]
+      !result.associations && (result.associations = {})
+      !result.associations[attr] && (result.associations[attr] = {})
+      result = result.associations[attr]
     }
   }
 }
@@ -50,11 +52,12 @@ function parseQuery (key, value, result) {
   for (let i = 0, len = arr.length; i < len; i++) {
     const attr = arr[i].trim()
     if (i === len - 1) {
-      !result.$where && (result.$where = {})
-      result.$where[attr] = value
+      !result.conditions && (result.conditions = {})
+      result.conditions[attr] = value
     } else {
-      !result[attr] && (result[attr] = {})
-      result = result[attr]
+      !result.associations && (result.associations = {})
+      !result.associations[attr] && (result.associations[attr] = {})
+      result = result.associations[attr]
     }
   }
 }
