@@ -95,7 +95,7 @@ if model "foo" got a db engine behind, it may query like:
 ```url
 http://localhost:3000/foos?a=1&bar.b=2,3,4
 ```
-it's may run a sql like:
+it may run a sql like:
 ```sql
  select * from foo
  inner join bar on bar.id = foo.bar_id

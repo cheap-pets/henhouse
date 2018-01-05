@@ -33,8 +33,6 @@ class HttpService {
     })
     koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
     const router = new KoaRouter()
-    koa.use(router.routes())
-    koa.use(router.allowedMethods())
     const server = http.createServer(koa.callback())
     server.on('close', () => {
       console.info('server closed.')
@@ -42,6 +40,7 @@ class HttpService {
     this.koa = koa
     this.router = router
     this.httpServer = server
+    this.__ready = false
   }
   use (middleware) {
     this.koa.use(middleware)
@@ -71,6 +70,11 @@ class HttpService {
     return this
   }
   listen (port) {
+    if (this.__ready === false) {
+      delete this.__ready
+      this.koa.use(this.router.routes())
+      this.koa.use(this.router.allowedMethods())
+    }
     this.httpServer.listen(port)
   }
   close () {
