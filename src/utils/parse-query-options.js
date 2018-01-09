@@ -69,19 +69,22 @@ function parseQueryOptions (query) {
   for (let key in query) {
     const value = query[key]
     switch (key) {
-      case 'fields':
+      case '_fields':
         parseAttributes(value, result)
         break
-      case 'order':
+      case '_order':
         parseOrders(value, result)
         break
-      case 'limit':
-      case 'offset':
-        result[key] = value
-        break
       default:
-        parseConditions(key, query[key], result)
+        if (key[0] === '_') {
+          result[key.substr(1)] = value
+        } else {
+          parseConditions(key, query[key], result)
+        }
     }
+  }
+  if (!query._fields && Object.keys(result).length) {
+    result.attributes = ['*']
   }
   return Object.keys(result).length ? result : null
 }
