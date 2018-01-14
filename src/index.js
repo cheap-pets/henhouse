@@ -2,8 +2,7 @@ const HttpService = require('./http-service')
 const methods = require('./http-service/http-methods')
 const resolve = require('./utils/resolve-path')
 
-const parseQueryOptions = require('./utils/parse-query-options')
-const parseRequestBody = require('./utils/parse-request-body')
+const parseQuery = require('./utils/parse-query')
 
 const HttpException = require('./http-service/http-exception')
 
@@ -24,12 +23,11 @@ class Henhouse {
     this.servicePath = options.servicePath
     this.models = {}
   }
-  define (store, modelName, attributes, options) {
-    options = options || {}
-    const model = store.define(modelName, attributes, options)
+  define (store, modelName) {
+    const args = Array.prototype.slice.call(arguments, 1)
+    const model = store.define.apply(store, args)
     model.store = store
-    model.attributes = attributes
-    model.path = options.path || getDefaultModelPath(modelName)
+    model.path = model.path || getDefaultModelPath(modelName)
     this.models[modelName] = model
     const methods = model.methods || {}
     for (let method in methods) {
@@ -60,15 +58,12 @@ methods.forEach(method => {
       (this.servicePath || '') + '/' + (model ? model.path : pathOrModel)
     )
     this.httpService[method](path, async (ctx, next) => {
-      Object.keys(ctx.query).length &&
-        (ctx.$queryOptions = parseQueryOptions(ctx.query))
-      ctx.request.body && (ctx.$requestBody = parseRequestBody(ctx.request.body))
+      parseQuery(ctx)
       await middleware(ctx, next, model)
     })
     if (model && ['get', 'put', 'patch', 'delete'].indexOf(method) >= 0) {
       this.httpService[method](path + '/:id', async (ctx, next) => {
-        ctx.$queryOptions = parseQueryOptions(ctx.query)
-        ctx.request.body && (ctx.$requestBody = parseRequestBody(ctx.request.body))
+        parseQuery(ctx)
         await middleware(ctx, next, model, ctx.params.id)
       })
     }

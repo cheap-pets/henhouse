@@ -6,7 +6,7 @@ service.use(async function (ctx, next) {
   next()
 })
 service.get('/test-query', async function (ctx, next) {
-  ctx.body = ctx.$queryOptions
+  ctx.body = ctx.$fields
   next()
 })
 service.post('/test-body', async function (ctx, next) {
