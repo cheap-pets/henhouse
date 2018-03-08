@@ -42,6 +42,7 @@ class Henhouse {
   useStatic (path, rootOrOptions) {
     path = resolve((this.servicePath || '') + '/' + path)
     this.httpService.useStatic(path, rootOrOptions)
+    return this
   }
   listen (port) {
     this.httpService.listen(port)

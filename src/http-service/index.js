@@ -28,7 +28,8 @@ class HttpService {
         ctx.app.emit('error', e, ctx)
       } finally {
         const ms = new Date() - start
-        console.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`)
+        ctx.app.emit('afterrequest', ms, ctx)
+        // console.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`)
       }
     })
     koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
