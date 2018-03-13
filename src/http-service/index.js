@@ -10,9 +10,9 @@ class HttpService {
   constructor (options) {
     options = options || {}
     const koa = new Koa()
-    koa.on('error', (err, ctx) => {
-      console.error('server error', err)
-    })
+    // koa.on('error', (err, ctx) => {
+    //   console.error('server error', err)
+    // })
     koa.use(async (ctx, next) => {
       const start = new Date()
       try {
@@ -35,9 +35,9 @@ class HttpService {
     koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
     const router = new KoaRouter()
     const server = http.createServer(koa.callback())
-    server.on('close', () => {
-      console.info('server closed.')
-    })
+    // server.on('close', () => {
+    //   console.info('server closed.')
+    // })
     this.koa = koa
     this.router = router
     this.httpServer = server
