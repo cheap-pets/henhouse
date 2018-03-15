@@ -37,14 +37,20 @@ function loadDefaultProxyConfig () {
 
 class Henhouse {
   constructor (options) {
-    const { servicePath, proxy } = options || {}
+    let { servicePath, proxy } = options || {}
+    if (servicePath) {
+      while (servicePath.indexOf('/') === 0) servicePath = servicePath.substr(1)
+      while (servicePath.lastIndexOf('/') === servicePath.length - 1) servicePath = servicePath.substr(0, servicePath.length - 1)
+      this.servicePath = servicePath
+    }
+    this.httpService = new HttpService({
+      servicePath
+    })
     const proxyConfig = proxy || loadDefaultProxyConfig()
-    this.httpService = new HttpService()
     if (proxyConfig) {
       this.proxyPort = proxyConfig.port
       this.proxyService = new ProxyService(proxyConfig.mappings)
     }
-    this.servicePath = servicePath
     this.models = {}
   }
   define (store, modelName) {
@@ -64,7 +70,6 @@ class Henhouse {
     return this
   }
   useStatic (path, rootOrOptions) {
-    path = resolve((this.servicePath || '') + '/' + path)
     this.httpService.useStatic(path, rootOrOptions)
     return this
   }

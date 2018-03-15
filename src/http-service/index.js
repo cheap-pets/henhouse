@@ -9,6 +9,7 @@ const { isString } = require('../utils/check-type')
 class HttpService {
   constructor (options) {
     options = options || {}
+    this.servicePath = options.servicePath
     const koa = new Koa()
     // koa.on('error', (err, ctx) => {
     //   console.error('server error', err)
@@ -48,6 +49,9 @@ class HttpService {
     return this
   }
   useStatic (path, options) {
+    if (path.indexOf('/') > 0) path = '/' + path
+    if (path.lastIndexOf('/') !== path.length - 1) path += '/'
+    if (this.servicePath) path = '/' + this.servicePath + path
     isString(options) && (options = { root: options })
     options.index === undefined && (options.index = 'index.html')
     this.koa.use(async (ctx, next) => {
@@ -57,7 +61,8 @@ class HttpService {
         ctx.path.indexOf(path) === 0
       ) {
         try {
-          done = await koaSend(ctx, ctx.path, options)
+          const s = this.servicePath ? ctx.path.substr(this.servicePath.length + 1) : ctx.path
+          done = await koaSend(ctx, s, options)
         } catch (err) {
           if (err.status !== 404) {
             throw err

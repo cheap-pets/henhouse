@@ -2,8 +2,8 @@
   "proxy": {
     "port": 9000,
     "mappings": {
-      "/portal/": "http://192.168.1.205:8081/portal/",
-      "/my-service/": "http://localhost:8091/my-service/"
+      "/my-service/": "http://localhost:3000/hello/", // 本地开发的服务
+      "*": "http://localhost:3000" // 部署在服务器上的根站点
     }
   }
 }
