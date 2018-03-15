@@ -1,4 +1,9 @@
+const { join, parse } = require('path')
+const { existsSync, readFileSync } = require('fs')
+const stripJsonComments = require('strip-json-comments')
+
 const HttpService = require('./http-service')
+const ProxyService = require('./proxy-service')
 const methods = require('./http-service/http-methods')
 const resolve = require('./utils/resolve-path')
 
@@ -16,11 +21,30 @@ function bindModelMethod (service, modelName, method, middleware) {
   service[method](modelName, middleware)
 }
 
+function loadDefaultProxyConfig () {
+  let config
+  const filePath = join(parse(process.argv[1]).dir, '.henhouserc')
+  try {
+    if (existsSync(filePath)) {
+      const s = readFileSync(filePath, 'utf8')
+      config = JSON.parse(stripJsonComments(s)).proxy
+    }
+  } catch (error) {
+    console.error('cannot read config file', '"' + filePath + '"')
+  }
+  return config
+}
+
 class Henhouse {
   constructor (options) {
-    options = options || {}
+    const { servicePath, proxy } = options || {}
+    const proxyConfig = proxy || loadDefaultProxyConfig()
     this.httpService = new HttpService()
-    this.servicePath = options.servicePath
+    if (proxyConfig) {
+      this.proxyPort = proxyConfig.port
+      this.proxyService = new ProxyService(proxyConfig.mappings)
+    }
+    this.servicePath = servicePath
     this.models = {}
   }
   define (store, modelName) {
@@ -44,20 +68,20 @@ class Henhouse {
     this.httpService.useStatic(path, rootOrOptions)
     return this
   }
-  listen (port) {
+  listen (port, proxyPort) {
     this.httpService.listen(port)
+    if (this.proxyService) this.proxyService.listen(proxyPort || this.proxyPort)
   }
   close () {
     this.httpService.close()
+    if (this.proxyService) this.proxyService.close()
   }
 }
 
 methods.forEach(method => {
   Henhouse.prototype[method] = function (pathOrModel, middleware) {
     const model = this.models[pathOrModel]
-    const path = resolve(
-      (this.servicePath || '') + '/' + (model ? model.path : pathOrModel)
-    )
+    const path = resolve((this.servicePath || '') + '/' + (model ? model.path : pathOrModel))
     this.httpService[method](path, async (ctx, next) => {
       parseQuery(ctx)
       await middleware(ctx, next, model)

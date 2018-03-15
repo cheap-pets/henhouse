@@ -2,8 +2,8 @@ const Henhouse = require('../src')
 
 const service = new Henhouse()
 service.use(async function (ctx, next) {
-  console.log('use1')
-  next()
+  await next()
+  if (!ctx.body) ctx.body = ctx.request.url
 })
 service.get('/test-query', async function (ctx, next) {
   ctx.body = ctx.$fields
