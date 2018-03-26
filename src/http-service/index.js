@@ -56,9 +56,10 @@ class HttpService {
     options.index === undefined && (options.index = 'index.html')
     this.koa.use(async (ctx, next) => {
       let done = false
+      const thisPath = ctx.path
       if (
         (ctx.method === 'HEAD' || ctx.method === 'GET') &&
-        ctx.path.indexOf(path) === 0
+        (thisPath.indexOf(path) === 0 || thisPath + '/' === path)
       ) {
         try {
           const s = this.servicePath ? ctx.path.substr(this.servicePath.length + 1) : ctx.path
