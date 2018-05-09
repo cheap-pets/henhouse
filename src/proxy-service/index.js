@@ -29,7 +29,9 @@ function doProxy (req, res, mapping) {
 class Proxy {
   constructor (mappings) {
     this.proxyMaps = []
-    this.proxyServer = HttpProxy.createProxyServer()
+    this.proxyServer = HttpProxy.createProxyServer({
+      xfwd: true
+    })
     this.proxyServer.on('error', function (err, req, res) {
       if (res) {
         res.writeHead(500, { 'Content-Type': 'text/plain' })
