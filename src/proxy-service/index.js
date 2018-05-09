@@ -20,7 +20,7 @@ function mapper (mappingPath, target) {
 
 function doProxy (req, res, mapping) {
   req.url = mapping.url
-  req.headers.host = mapping.host
+  // req.headers.host = mapping.host
   this.proxyServer.web(req, res, {
     target: mapping.target
   })
