@@ -55,25 +55,18 @@ class HttpService {
     isString(options) && (options = { root: options })
     options.index === undefined && (options.index = 'index.html')
     this.koa.use(async (ctx, next) => {
-      let done = false
-      if (ctx.path + '/' === path) {
-        ctx.path += '/'
-      }
-      if (
-        (ctx.method === 'HEAD' || ctx.method === 'GET') &&
-        (ctx.path.indexOf(path) === 0)
-      ) {
+      await next()
+      if ((ctx.method !== 'HEAD' && ctx.method !== 'GET') || ctx.body != null || ctx.status !== 404) return
+      if (ctx.path + '/' === path) ctx.path += '/'
+      if (ctx.path.indexOf(path) === 0) {
         try {
           const s = this.servicePath ? ctx.path.substr(this.servicePath.length + 1) : ctx.path
-          done = await koaSend(ctx, s, options)
+          await koaSend(ctx, s, options)
         } catch (err) {
           if (err.status !== 404) {
             throw err
           }
         }
-      }
-      if (!done) {
-        await next()
       }
     })
     return this
