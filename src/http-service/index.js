@@ -60,7 +60,7 @@ class HttpService {
       if (ctx.path + '/' === path) ctx.path += '/'
       if (ctx.path.indexOf(path) === 0) {
         try {
-          const s = ctx.path.substr(path.length)
+          const s = ctx.path.substr(path.length) || '/'
           await koaSend(ctx, s, options)
         } catch (err) {
           if (err.status !== 404) {
