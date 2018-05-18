@@ -57,10 +57,12 @@ class HttpService {
     this.koa.use(async (ctx, next) => {
       await next()
       if ((ctx.method !== 'HEAD' && ctx.method !== 'GET') || ctx.body != null || ctx.status !== 404) return
-      if (ctx.path + '/' === path) ctx.path += '/'
-      if (ctx.path.indexOf(path) === 0) {
+      let s = ctx.path
+      if (this.servicePath) s = s.substr(this.servicePath.length + 1)
+      if (s + '/' === path) s += '/'
+      if (s.indexOf(path) === 0) {
         try {
-          const s = this.servicePath ? ctx.path.substr(this.servicePath.length + 1) : ctx.path
+          s = s.substr(path.length)
           await koaSend(ctx, s, options)
         } catch (err) {
           if (err.status !== 404) {
