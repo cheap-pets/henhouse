@@ -11,6 +11,7 @@ class HttpService {
     options = options || {}
     this.servicePath = options.servicePath
     const koa = new Koa()
+    if (options.onerror) koa.onerror = options.onerror
     // koa.on('error', (err, ctx) => {
     //   console.error('server error', err)
     // })
