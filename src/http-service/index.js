@@ -1,9 +1,11 @@
 const http = require('http')
 const Koa = require('koa')
 const KoaRouter = require('koa-router')
+const koaCompress = require('koa-compress')
 const koaBody = require('koa-body')
 const koaSend = require('koa-send')
 const methods = require('./http-methods')
+const zlib = require('zlib')
 const { isString } = require('../utils/check-type')
 
 class HttpService {
@@ -34,6 +36,13 @@ class HttpService {
         // console.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`)
       }
     })
+    if (options.compress) {
+      koa.use(koaCompress({
+        filter: contentType => /text/i.test(contentType),
+        threshold: 2048,
+        flush: zlib.Z_SYNC_FLUSH
+      }))
+    }
     koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
     const router = new KoaRouter()
     const server = http.createServer(koa.callback())
