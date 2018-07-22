@@ -38,9 +38,10 @@ class HttpService {
     })
     if (options.compress) {
       koa.use(koaCompress({
-        filter: contentType => /text/i.test(contentType),
-        threshold: 2048,
-        flush: zlib.Z_SYNC_FLUSH
+        filter: contentType => /text|json|javascript/i.test(contentType)
+        // level: 9,
+        // threshold: 2048,
+        // flush: zlib.Z_SYNC_FLUSH
       }))
     }
     koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
