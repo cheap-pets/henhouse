@@ -1,9 +1,6 @@
-const { join, parse } = require('path')
-const { existsSync, readFileSync } = require('fs')
-const stripJsonComments = require('strip-json-comments')
+const EventEmitter = require('events')
 
 const HttpService = require('./http-service')
-const ProxyService = require('./proxy-service')
 const methods = require('./http-service/http-methods')
 const resolve = require('./utils/resolve-path')
 
@@ -21,38 +18,14 @@ function bindModelMethod (service, modelName, method, middleware) {
   service[method](modelName, middleware)
 }
 
-function loadDefaultProxyConfig () {
-  let config
-  const filePath = join(parse(process.argv[1]).dir, '.henhouserc')
-  try {
-    if (existsSync(filePath)) {
-      const s = readFileSync(filePath, 'utf8')
-      config = JSON.parse(stripJsonComments(s)).proxy
-    }
-  } catch (error) {
-    console.error('cannot read config file', '"' + filePath + '"')
-  }
-  return config
-}
-
-class Henhouse {
-  constructor (options) {
-    let { servicePath, proxy, onerror, compress } = options || {}
-    if (servicePath) {
-      while (servicePath.indexOf('/') === 0) servicePath = servicePath.substr(1)
-      while (servicePath.lastIndexOf('/') === servicePath.length - 1) servicePath = servicePath.substr(0, servicePath.length - 1)
-      this.servicePath = servicePath
-    }
+class Henhouse extends EventEmitter {
+  constructor (options = {}) {
+    let { onerror, compress } = options
+    super()
     this.httpService = new HttpService({
       compress,
-      onerror,
-      servicePath
+      onerror
     })
-    const proxyConfig = proxy || loadDefaultProxyConfig()
-    if (proxyConfig) {
-      this.proxyPort = proxyConfig.port
-      this.proxyService = new ProxyService(proxyConfig.mappings)
-    }
     this.models = {}
   }
   define (store, modelName) {

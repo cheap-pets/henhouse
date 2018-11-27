@@ -1,27 +1,33 @@
 {
   "name": "henhouse",
-  "version": "2.0.34",
-  "description": "A Microservices Framework for REST APIs",
+  "version": "3.0.0",
+  "description": "a simple http server, powered by koa",
   "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "scripts": {},
   "author": "scrollbar.ww",
   "license": "MIT",
   "keywords": [
-    "henhouse"
-  ],
-  "files": [
-    "src"
+    "henhouse",
+    "http",
+    "server",
+    "proxy",
+    "koa"
   ],
   "engines": {
     "node": ">=8.9.0"
   },
   "dependencies": {
     "http-proxy": "^1.17.0",
-    "koa": "^2.5.2",
+    "koa": "^2.6.2",
     "koa-body": "^4.0.4",
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
-    "strip-json-comments": "^2.0.1"
+    "lodash.isfunction": "^3.0.9",
+    "lodash.isstring": "^4.0.1",
+    "methods": "^1.1.2"
   }
 }

@@ -5,12 +5,10 @@ const koaCompress = require('koa-compress')
 const koaBody = require('koa-body')
 const koaSend = require('koa-send')
 const methods = require('./http-methods')
-const zlib = require('zlib')
 const { isString } = require('../utils/check-type')
 
 class HttpService {
-  constructor (options) {
-    options = options || {}
+  constructor (options = {}) {
     this.servicePath = options.servicePath
     const koa = new Koa()
     if (options.onerror) koa.onerror = options.onerror
