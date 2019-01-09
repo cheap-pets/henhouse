@@ -44,7 +44,7 @@ class HttpService {
         // flush: zlib.Z_SYNC_FLUSH
       }))
     }
-    koa.use(koaBody({ formidable: { uploadDir: __dirname } }))
+    koa.use(koaBody({ patchNode: true, formidable: { uploadDir: __dirname } }))
     const router = new KoaRouter()
     const server = http.createServer(koa.callback())
     // server.on('close', () => {
