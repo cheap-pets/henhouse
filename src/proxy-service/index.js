@@ -61,6 +61,7 @@ class Proxy {
       this.add(mappings)
     }
   }
+
   add (mappings) {
     Object.keys(mappings).forEach(k => {
       if (k === '*') {
@@ -71,9 +72,11 @@ class Proxy {
     })
     return this
   }
-  listen (port) {
-    this.httpServer.listen(port)
+
+  listen (port, host) {
+    this.httpServer.listen(port, host)
   }
+
   close () {
     this.proxyServer.close()
     this.httpServer.close()

@@ -5,7 +5,7 @@ const koaCompress = require('koa-compress')
 const koaBody = require('koa-body')
 const koaSend = require('koa-send')
 const methods = require('./http-methods')
-const zlib = require('zlib')
+// const zlib = require('zlib')
 const { isString } = require('../utils/check-type')
 
 class HttpService {
@@ -55,10 +55,12 @@ class HttpService {
     this.httpServer = server
     this.__ready = false
   }
+
   use (middleware) {
     this.koa.use(middleware)
     return this
   }
+
   useStatic (path, options) {
     if (path.indexOf('/') > 0) path = '/' + path
     if (path.lastIndexOf('/') !== path.length - 1) path += '/'
@@ -82,14 +84,16 @@ class HttpService {
     })
     return this
   }
-  listen (port) {
+
+  listen (port, host = '0.0.0.0') {
     if (this.__ready === false) {
       delete this.__ready
       this.koa.use(this.router.routes())
       this.koa.use(this.router.allowedMethods())
     }
-    this.httpServer.listen(port)
+    this.httpServer.listen(port, host)
   }
+
   close () {
     this.httpServer.close()
   }

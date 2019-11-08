@@ -55,6 +55,7 @@ class Henhouse {
     }
     this.models = {}
   }
+
   define (store, modelName) {
     const args = Array.prototype.slice.call(arguments, 1)
     const model = store.define.apply(store, args)
@@ -62,23 +63,33 @@ class Henhouse {
     model.path = model.path || getDefaultModelPath(modelName)
     this.models[modelName] = model
     const methods = model.methods || {}
-    for (let method in methods) {
+    for (const method in methods) {
       bindModelMethod(this, modelName, method, methods[method])
     }
     return model
   }
+
   use (middleware) {
     this.httpService.use(middleware)
     return this
   }
+
   useStatic (path, rootOrOptions) {
     this.httpService.useStatic(path, rootOrOptions)
     return this
   }
-  listen (port, proxyPort) {
+
+  listen (port, proxyPort, host = '0.0.0.0') {
+    if (proxyPort && isNaN(Number(proxyPort))) {
+      host = proxyPort
+      proxyPort = undefined
+    }
     this.httpService.listen(port)
-    if (this.proxyService) this.proxyService.listen(proxyPort || this.proxyPort)
+    if (this.proxyService) {
+      this.proxyService.listen(proxyPort || this.proxyPort, host)
+    }
   }
+
   close () {
     this.httpService.close()
     if (this.proxyService) this.proxyService.close()

@@ -26,4 +26,4 @@ service
   .post('/test-body', async function (ctx, next) {
     ctx.body = ctx.$requestBody
   })
-  .listen(3000)
+  .listen(3000, '0.0.0.0')
