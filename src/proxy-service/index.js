@@ -30,7 +30,8 @@ class Proxy {
   constructor (mappings) {
     this.proxyMaps = []
     this.proxyServer = HttpProxy.createProxyServer({
-      xfwd: true
+      xfwd: true,
+      changeOrigin: true
     })
     this.proxyServer.on('error', function (err, req, res) {
       if (res) {
