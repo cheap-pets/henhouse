@@ -1,12 +1,13 @@
 const http = require('http')
 const Koa = require('koa')
-const KoaRouter = require('koa-router')
-const koaCompress = require('koa-compress')
 const koaBody = require('koa-body')
 const koaSend = require('koa-send')
-const methods = require('./http-methods')
+const KoaRouter = require('koa-router')
+const koaCompress = require('koa-compress')
 // const zlib = require('zlib')
-const { isString } = require('../utils/check-type')
+
+const methods = require('./http-methods')
+const { isString, isFunction } = require('../utils/check-type')
 
 class HttpService {
   constructor (options) {
@@ -56,8 +57,12 @@ class HttpService {
     this.__ready = false
   }
 
-  use (middleware) {
-    this.koa.use(middleware)
+  use (path, middleware) {
+    if (isString(path) && isFunction(middleware)) {
+      this.router.use(path, middleware)
+    } else if (isFunction(path)) {
+      this.koa.use(path)
+    }
     return this
   }
 

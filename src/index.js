@@ -4,14 +4,14 @@ const stripJsonComments = require('strip-json-comments')
 
 const HttpService = require('./http-service')
 const ProxyService = require('./proxy-service')
-const methods = require('./http-service/http-methods')
+
 const resolve = require('./utils/resolve-path')
-
 const parseQuery = require('./utils/parse-query')
-
+const DataTypes = require('./constants/data-types')
+const methods = require('./http-service/http-methods')
 const HttpException = require('./http-service/http-exception')
 
-const DataTypes = require('./constants/data-types')
+const { isString } = require('./utils/check-type')
 
 function getDefaultModelPath (modelName) {
   return modelName.replace(/([A-Z])/g, '-$1').toLowerCase() + 's'
@@ -69,8 +69,11 @@ class Henhouse {
     return model
   }
 
-  use (middleware) {
-    this.httpService.use(middleware)
+  use (path, middleware) {
+    if (isString(path)) {
+      path = resolve((this.servicePath || '') + '/' + path)
+    }
+    this.httpService.use(path, middleware)
     return this
   }
 
