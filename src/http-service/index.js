@@ -10,8 +10,7 @@ const methods = require('./http-methods')
 const { isString, isFunction } = require('../utils/check-type')
 
 class HttpService {
-  constructor (options) {
-    options = options || {}
+  constructor (options = {}) {
     this.servicePath = options.servicePath
     const koa = new Koa()
     if (options.onerror) koa.onerror = options.onerror
@@ -45,7 +44,13 @@ class HttpService {
         // flush: zlib.Z_SYNC_FLUSH
       }))
     }
-    koa.use(koaBody({ patchNode: true, formidable: { uploadDir: __dirname } }))
+    koa.use(koaBody({
+      patchNode: true,
+      formidable: {
+        uploadDir: __dirname
+      },
+      ...options.bodyParser
+    }))
     const router = new KoaRouter()
     const server = http.createServer(koa.callback())
     // server.on('close', () => {

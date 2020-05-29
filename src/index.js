@@ -37,7 +37,7 @@ function loadDefaultProxyConfig () {
 
 class Henhouse {
   constructor (options) {
-    let { servicePath, proxy, onerror, compress } = options || {}
+    let { servicePath, proxy, onerror, compress, bodyParser } = options || {}
     if (servicePath) {
       while (servicePath.indexOf('/') === 0) servicePath = servicePath.substr(1)
       while (servicePath.lastIndexOf('/') === servicePath.length - 1) servicePath = servicePath.substr(0, servicePath.length - 1)
@@ -46,7 +46,8 @@ class Henhouse {
     this.httpService = new HttpService({
       compress,
       onerror,
-      servicePath
+      servicePath,
+      bodyParser
     })
     const proxyConfig = proxy || loadDefaultProxyConfig()
     if (proxyConfig) {
