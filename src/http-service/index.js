@@ -1,8 +1,8 @@
 const http = require('http')
 const Koa = require('koa')
-const koaBody = require('koa-body')
+const koaBody = require('koa-body').koaBody
 const koaSend = require('koa-send')
-const KoaRouter = require('koa-router')
+const KoaRouter = require('@koa/router')
 const koaCompress = require('koa-compress')
 
 const methods = require('./http-methods')
@@ -46,9 +46,7 @@ class HttpService {
 
     koa.use(koaBody({
       patchNode: true,
-      formidable: {
-        uploadDir: __dirname
-      },
+      formidable: { uploadDir: __dirname },
       ...options.bodyParser
     }))
 
