@@ -38,22 +38,29 @@ function loadDefaultProxyConfig () {
 class Henhouse {
   constructor (options) {
     let { servicePath, proxy, onerror, compress, bodyParser } = options || {}
+
     if (servicePath) {
       while (servicePath.indexOf('/') === 0) servicePath = servicePath.substr(1)
       while (servicePath.lastIndexOf('/') === servicePath.length - 1) servicePath = servicePath.substr(0, servicePath.length - 1)
+
       this.servicePath = servicePath
     }
+
     this.httpService = new HttpService({
+      koa: options.koa,
       compress,
       onerror,
       servicePath,
       bodyParser
     })
+
     const proxyConfig = proxy || loadDefaultProxyConfig()
+
     if (proxyConfig) {
       this.proxyPort = proxyConfig.port
       this.proxyService = new ProxyService(proxyConfig.mappings)
     }
+
     this.models = {}
   }
 

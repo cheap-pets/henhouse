@@ -1,8 +1,13 @@
+const path = require('path')
+const axios = require('axios')
 const Henhouse = require('../src')
-const { resolve, parse } = require('path')
+// const { resolve, parse } = require('path')
 
 const service = new Henhouse({
-  servicePath: 'yo'
+  servicePath: 'yo',
+  koa: {
+    proxy: true
+  }
 })
 
 service
@@ -12,7 +17,9 @@ service
   })
   .useStatic(
     '/',
-    parse(__dirname).base === 'src' ? resolve(__dirname, '..', 'dist', 'web-content') : resolve(__dirname, 'web-content')
+    path.parse(__dirname).base === 'src'
+      ? path.resolve(__dirname, '..', 'dist', 'web-content')
+      : path.resolve(__dirname, 'web-content')
   )
   .get('/', async function (ctx, next) {
     ctx.body = 'root'
@@ -29,11 +36,9 @@ service
   })
   .listen(3000, '0.0.0.0')
 
-const axios = require('axios')
-
 axios({
   method: 'post',
-  url: 'http://localhost:3000/yo/test-body',
+  url: 'http://127.0.0.1:3000/yo/test-body',
   data: 'a=123'
 }).then(res => {
   console.log(res)

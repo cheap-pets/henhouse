@@ -4,38 +4,37 @@ const koaBody = require('koa-body')
 const koaSend = require('koa-send')
 const KoaRouter = require('koa-router')
 const koaCompress = require('koa-compress')
-// const zlib = require('zlib')
 
 const methods = require('./http-methods')
 const { isString, isFunction } = require('../utils/check-type')
 
 class HttpService {
   constructor (options = {}) {
-    this.servicePath = options.servicePath
-    const koa = new Koa()
+    const koa = new Koa(options.koa)
+
     if (options.onerror) koa.onerror = options.onerror
-    // koa.on('error', (err, ctx) => {
-    //   console.error('server error', err)
-    // })
+    this.servicePath = options.servicePath
+
     koa.use(async (ctx, next) => {
       const start = new Date()
+
       try {
         await next()
       } catch (e) {
-        ctx.status = parseInt(e.status, 10) || 500
         if (e.stack && options.logStackError !== false) {
           Object.defineProperty(e, 'stack', {
             enumerable: true
           })
         }
+
+        ctx.status = parseInt(e.status, 10) || 500
         ctx.body = e
         ctx.app.emit('error', e, ctx)
       } finally {
-        const ms = new Date() - start
-        ctx.app.emit('afterrequest', ms, ctx)
-        // console.info(`${ctx.method} ${ctx.url} - ${ctx.status} - ${ms}ms`)
+        ctx.app.emit('afterrequest', new Date() - start, ctx)
       }
     })
+
     if (options.compress) {
       koa.use(koaCompress({
         filter: contentType => /text|json|javascript/i.test(contentType)
@@ -44,6 +43,7 @@ class HttpService {
         // flush: zlib.Z_SYNC_FLUSH
       }))
     }
+
     koa.use(koaBody({
       patchNode: true,
       formidable: {
@@ -51,11 +51,10 @@ class HttpService {
       },
       ...options.bodyParser
     }))
+
     const router = new KoaRouter()
     const server = http.createServer(koa.callback())
-    // server.on('close', () => {
-    //   console.info('server closed.')
-    // })
+
     this.koa = koa
     this.router = router
     this.httpServer = server
@@ -75,15 +74,19 @@ class HttpService {
     if (path.indexOf('/') > 0) path = '/' + path
     if (path.lastIndexOf('/') !== path.length - 1) path += '/'
     if (this.servicePath) path = '/' + this.servicePath + path
+
     isString(options) && (options = { root: options })
     options.index === undefined && (options.index = 'index.html')
+
     this.koa.use(async (ctx, next) => {
       await next()
+
       if ((ctx.method !== 'HEAD' && ctx.method !== 'GET') || ctx.body != null || ctx.status !== 404) return
       if (ctx.path + '/' === path) ctx.path += '/'
       if (ctx.path.indexOf(path) === 0) {
         try {
           const s = ctx.path.substr(path.length) || '/'
+
           await koaSend(ctx, s, options)
         } catch (err) {
           if (err.status !== 404) {
@@ -92,15 +95,18 @@ class HttpService {
         }
       }
     })
+
     return this
   }
 
   listen (port, host = '0.0.0.0') {
     if (this.__ready === false) {
       delete this.__ready
+
       this.koa.use(this.router.routes())
       this.koa.use(this.router.allowedMethods())
     }
+
     this.httpServer.listen(port, host)
   }
 
