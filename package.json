@@ -1,6 +1,6 @@
 {
   "name": "henhouse",
-  "version": "2.0.43",
+  "version": "2.0.44",
   "description": "A Microservices Framework for REST APIs",
   "main": "src/index.js",
   "scripts": {},
@@ -13,14 +13,14 @@
     "src"
   ],
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=14"
   },
   "dependencies": {
     "@koa/router": "^12.0.0",
     "http-proxy": "^1.18.1",
-    "koa": "^2.13.4",
+    "koa": "^2.14.2",
     "koa-body": "^6.0.1",
-    "koa-compress": "^5.1.0",
+    "koa-compress": "^5.1.1",
     "koa-send": "^5.0.1",
     "strip-json-comments": "^3.1.1"
   },

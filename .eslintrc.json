@@ -1,5 +1,6 @@
 {
   "root": true,
+  "parser": "@babel/eslint-parser",
   "extends": [
     "standard",
     "plugin:node/recommended",
@@ -9,25 +10,26 @@
     "node",
     "security"
   ],
-  "globals": {},
   "env": {
     "commonjs": true,
-    "es6": true,
     "node": true
   },
   "rules": {
-    "security/detect-object-injection": 0,
+    "prefer-const": 2,
+    "complexity": [ 1, 10],
     "max-len": [
       1,
       {
         "code": 120,
         "tabWidth": 2,
-        "ignoreComments": true,
-        "ignoreTrailingComments": true,
         "ignoreUrls": true,
-        "ignoreStrings": true,
+        "ignoreStrings": false,
+        "ignoreComments": true,
+        "ignoreRegExpLiterals": true,
+        "ignoreTrailingComments": true,
         "ignoreTemplateLiterals": true
       }
-    ]
+    ],
+    "security/detect-object-injection": 0
   }
 }

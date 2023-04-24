@@ -8,6 +8,9 @@ const koaCompress = require('koa-compress')
 const methods = require('./http-methods')
 const { isString, isFunction } = require('../utils/check-type')
 
+const CACHE_MAX_AGE = 48 * 60 * 60 * 1000
+const HTML_CACHE_MAX_AGE = 2 * 60 * 60 * 1000
+
 class HttpService {
   constructor (options = {}) {
     const koa = new Koa(options.koa)
@@ -68,28 +71,48 @@ class HttpService {
     return this
   }
 
-  useStatic (path, options) {
-    if (path.indexOf('/') > 0) path = '/' + path
-    if (path.lastIndexOf('/') !== path.length - 1) path += '/'
-    if (this.servicePath) path = '/' + this.servicePath + path
+  useStatic (path, options = {}) {
+    function resolvePath (servicePath) {
+      if (path.indexOf('/') > 0) path = '/' + path
+      if (path.lastIndexOf('/') !== path.length - 1) path += '/'
+      if (servicePath) path = '/' + servicePath + path
+    }
 
-    isString(options) && (options = { root: options })
-    options.index === undefined && (options.index = 'index.html')
+    function isHandleable (ctx) {
+      return (
+        ['HEAD', 'GET'].includes(ctx.method) &&
+        ctx.body == null &&
+        ctx.status === 404 &&
+        ctx.path.indexOf(path) === 0
+      )
+    }
+
+    resolvePath(this.servicePath)
 
     this.koa.use(async (ctx, next) => {
       await next()
 
-      if ((ctx.method !== 'HEAD' && ctx.method !== 'GET') || ctx.body != null || ctx.status !== 404) return
       if (ctx.path + '/' === path) ctx.path += '/'
-      if (ctx.path.indexOf(path) === 0) {
-        try {
-          const s = ctx.path.substr(path.length) || '/'
+      if (!isHandleable(ctx)) return
 
-          await koaSend(ctx, s, options)
-        } catch (err) {
-          if (err.status !== 404) {
-            throw err
-          }
+      try {
+        const s = ctx.path.substr(path.length) || '/'
+        const isHTML = s.toLowerCase().indexOf('.htm') > 0
+
+        const sendOptions = Object.assign(
+          {
+            maxAge: isHTML
+              ? (options.htmlCacheMaxAge ?? HTML_CACHE_MAX_AGE)
+              : (options.cacheCacheMaxAge ?? CACHE_MAX_AGE),
+            index: 'index.html'
+          },
+          isString(options) ? { root: options } : options
+        )
+
+        await koaSend(ctx, s, sendOptions)
+      } catch (err) {
+        if (err.status !== 404) {
+          throw err
         }
       }
     })
