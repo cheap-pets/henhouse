@@ -103,7 +103,7 @@ class HttpService {
           {
             maxAge: isHTML
               ? (options.htmlCacheMaxAge ?? HTML_CACHE_MAX_AGE)
-              : (options.cacheCacheMaxAge ?? CACHE_MAX_AGE),
+              : (options.cacheMaxAge ?? CACHE_MAX_AGE),
             index: 'index.html'
           },
           isString(options) ? { root: options } : options
