@@ -97,12 +97,12 @@ class HttpService {
 
       try {
         const s = ctx.path.substr(path.length) || '/'
-        const isHTML = s.toLowerCase().indexOf('.htm') > 0
+        const isHTML = s === '/' || s.toLowerCase().indexOf('.htm') > 0
 
         const sendOptions = Object.assign(
           {
             maxAge: isHTML
-              ? (options.htmlCacheMaxAge ?? HTML_CACHE_MAX_AGE)
+              ? undefined
               : (options.cacheMaxAge ?? CACHE_MAX_AGE),
             index: 'index.html'
           },

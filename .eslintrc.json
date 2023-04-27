@@ -16,7 +16,7 @@
   },
   "rules": {
     "prefer-const": 2,
-    "complexity": [ 1, 10],
+    "complexity": [ 1, 15],
     "max-len": [
       1,
       {
